@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Portal | College Events</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f3f6fb;color:#1f2937}
+header{background:#183b65;color:white;padding:22px 16px;text-align:center}nav{text-align:center;padding:14px;background:#fff}nav a{color:#1769aa;margin:0 12px;text-decoration:none;font-weight:bold}
+main{max-width:950px;margin:25px auto;padding:0 16px}.intro,.event{background:white;padding:20px;border-radius:12px;box-shadow:0 5px 18px #17324d15;margin-bottom:18px}
+.events{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}.event h3{margin-top:0;color:#183b65}.meta{color:#475569;font-size:14px}
+button{background:#1769aa;color:white;border:0;border-radius:7px;padding:10px 14px;cursor:pointer;font-weight:bold}button:hover{background:#104e82}button:disabled{background:#64748b;cursor:default}
+@media(max-width:600px){nav a{display:inline-block;margin:5px}}
+</style>
+</head>
+<body>
+<header><h1>Student Event Portal</h1><p>Explore and register for campus events</p></header>
+<nav><a href="index.html">Home</a><a href="admin.html">Admin Portal</a></nav>
+<main>
+<section class="intro"><h2>Upcoming Events</h2><p>View the event details and register your interest.</p></section>
+<section id="events" class="events"></section>
+</main>
+<script>
+const STORAGE_KEY="collegeEvents";
+const REG_KEY="collegeEventRegistrations";
+function renderEvents(){
+ const container=document.getElementById("events");
+ const events=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");
+ const registrations=JSON.parse(localStorage.getItem(REG_KEY)||"[]");
+ container.innerHTML="";
+ if(!events.length){container.innerHTML="<div class='event'><p>No events are available right now. Please check again later.</p></div>";return;}
+ events.forEach((event,index)=>{
+   const card=document.createElement("article");card.className="event";
+   const title=document.createElement("h3");title.textContent=event.name;
+   const meta=document.createElement("p");meta.className="meta";meta.textContent="Date: "+event.date+" | Venue: "+event.venue;
+   const organizer=document.createElement("p");organizer.textContent="Organizer: "+event.organizer;
+   const desc=document.createElement("p");desc.textContent=event.description;
+   const btn=document.createElement("button");
+   const registered=registrations.includes(index+"-"+event.name);
+   btn.textContent=registered?"Registered":"Register";
+   btn.disabled=registered;
+   btn.addEventListener("click",()=>{
+     const current=JSON.parse(localStorage.getItem(REG_KEY)||"[]");
+     const key=index+"-"+event.name;
+     if(!current.includes(key)){current.push(key);localStorage.setItem(REG_KEY,JSON.stringify(current));}
+     renderEvents();alert("Your interest has been registered!");
+   });
+   card.append(title,meta,organizer,desc,btn);container.appendChild(card);
+ });
+}
+renderEvents();
+</script>
+</body>
+</html>
